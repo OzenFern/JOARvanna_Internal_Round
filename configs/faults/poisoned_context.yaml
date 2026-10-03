@@ -1,0 +1,3 @@
+fault_type: "poisoned_context"
+description: "Subtly alter retrieved documents or schemas."
+probability: 1.0

@@ -1,0 +1,6 @@
+name: "Text to SQL"
+task_type: "text2sql"
+tools:
+  - "get_schema"
+  - "execute_sql"
+max_steps: 10

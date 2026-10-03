@@ -1,0 +1,5 @@
+name: "Math Problem Solving"
+task_type: "math"
+tools:
+  - "calculator"
+max_steps: 15

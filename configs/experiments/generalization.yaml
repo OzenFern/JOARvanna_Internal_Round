@@ -1,0 +1,4 @@
+name: "Generalization Test"
+train_n: 1000
+eval_n: 200
+held_out_faults: ["poisoned_context"]

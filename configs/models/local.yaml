@@ -1,0 +1,6 @@
+architecture: "GradientBoosting"
+embeddings: "TF-IDF"
+max_features: 128
+thresholds:
+  high_confidence: 0.8
+  low_confidence: 0.5

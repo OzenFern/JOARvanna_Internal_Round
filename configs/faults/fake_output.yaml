@@ -1,0 +1,3 @@
+fault_type: "fake_output"
+description: "Fabricate a completely wrong/fake result."
+probability: 1.0

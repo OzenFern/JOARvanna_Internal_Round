@@ -1,0 +1,6 @@
+name: "QA Tools"
+task_type: "qa"
+tools:
+  - "search"
+  - "retrieve"
+max_steps: 10

@@ -1,0 +1,3 @@
+fault_type: "bad_args"
+description: "Corrupt tool arguments or LLM intermediate outputs."
+probability: 1.0

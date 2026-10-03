@@ -1,0 +1,3 @@
+fault_type: "truncation"
+description: "Cut off context to simulate token limits."
+probability: 1.0
