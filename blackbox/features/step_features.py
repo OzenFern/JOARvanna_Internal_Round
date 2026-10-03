@@ -8,8 +8,6 @@ from __future__ import annotations
 import math
 from typing import Any
 
-import numpy as np
-
 from blackbox.capture.schema import AgentStep, StepType
 
 # List of known tools for one-hot encoding

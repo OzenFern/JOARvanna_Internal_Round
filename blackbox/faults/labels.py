@@ -25,9 +25,9 @@ class FaultLabel:
     run_id:     str
     fault_type: str
     fault_step: int
-    run_failed: bool
-    task_type:  str
-    n_steps:    int
+    run_failed: bool = True
+    task_type:  str = "math"
+    n_steps:    int = 6
 
 
 class LabelStore:
@@ -39,6 +39,16 @@ class LabelStore:
 
     def add(self, label: FaultLabel) -> None:
         self._labels[label.run_id] = label
+
+    def set(self, run_id: str, fault_step: int, fault_type: str, run_failed: bool = True, task_type: str = "custom", n_steps: int = 5) -> None:
+        self.add(FaultLabel(
+            run_id=run_id,
+            fault_type=fault_type,
+            fault_step=fault_step,
+            run_failed=run_failed,
+            task_type=task_type,
+            n_steps=n_steps
+        ))
 
     def get(self, run_id: str) -> FaultLabel | None:
         return self._labels.get(run_id)
