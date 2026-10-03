@@ -24,16 +24,16 @@ Agent Execution / Benchmark Traces
                 │
                 ▼
       ┌──────────────────┐
-      │ Trace Store (JSON)│
+      │Trace Store (JSON)│
       └─────────┬────────┘
                 │
         ┌───────┴───────┐
         ▼               ▼
 ┌──────────────┐  ┌────────────────────────┐
-│   LOCAL ML   │  │ CHECKPOINT & REPLAY   │
+│   LOCAL ML   │  │ CHECKPOINT & REPLAY    │
 │  ANALYZER    │  │        ENGINE          │
 │ (<50ms target│  │ (State reconstruction  │
-│  attribution)│  │  & Branch Execution)  │
+│  attribution)│  │  & Branch Execution)   │
 └───────┬──────┘  └───────────┬────────────┘
         │                     │
         ▼                     ▼
@@ -207,12 +207,3 @@ JOARVANNA Dev/
 ├── scripts/                          # CLI automation scripts
 └── README.md                         # Project documentation
 ```
-
----
-
-## 🏆 Key Features for Hackathon Judges
-
-1. **End-to-End Working System:** Complete backend engine, ML/LLM diagnosis, checkpointed replay sandbox, CLI tools, and a 6-page interactive Streamlit visual workbench.
-2. **Speed + Accuracy Tradeoff:** Ultra-fast local ML attribution (< 1 ms latency) with opt-in Cloud LLM consensus.
-3. **True Time-Travel Debugging:** Allows developers to inspect state at Step $k$, edit parameters, and re-execute forward, proving whether the proposed fix works while saving 50–80% of computation tokens.
-4. **Reproducible Benchmark Suite:** Ground-truth fault injection engine covering calculation faults, bad arguments, poisoned document context, and truncation across Math, QA, and SQL domains.
