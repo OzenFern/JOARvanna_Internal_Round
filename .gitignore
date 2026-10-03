@@ -39,10 +39,12 @@ data/artifacts/*
 data/cache/*
 data/checkpoints/*
 data/traces/*
+data/reports/*
 !data/artifacts/.gitkeep
 !data/cache/.gitkeep
 !data/checkpoints/.gitkeep
 !data/traces/.gitkeep
+!data/reports/.gitkeep
 
 # Jupyter
 .ipynb_checkpoints/
