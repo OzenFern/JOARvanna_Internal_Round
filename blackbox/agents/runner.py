@@ -27,32 +27,15 @@ from blackbox.agents.tasks import qa as qa_tasks
 from blackbox.agents.tasks import text2sql as sql_tasks
 from blackbox.faults.injector import FaultInjector
 
-
 def _close_enough(a: Any, b: Any, tol: float = 0.02) -> bool:
-    # Try numeric comparison first by extracting numbers from both strings
-    a_str = str(a)
-    b_str = str(b)
-    
-    # Extract numbers from both agent output and expected answer
-    a_nums = re.findall(r"-?\d[\d,]*\.?\d*", a_str)
-    b_nums = re.findall(r"-?\d[\d,]*\.?\d*", b_str)
-    
-    # If both have numbers, compare the last number from each
-    if a_nums and b_nums:
-        a_val = float(a_nums[-1].replace(",", ""))
-        b_val = float(b_nums[-1].replace(",", ""))
-        return abs(a_val - b_val) <= tol
-    
-    # If only b is numeric (int/float type), extract from a and compare
+    # Numeric expected answers (math): pull the last number out of the text,
+    # so "$439.40" or "The final answer is $439.40." matches 439.4.
     if isinstance(b, (int, float)):
-        if not a_nums:
+        nums = re.findall(r"-?\d[\d,]*\.?\d*", str(a))
+        if not nums:
             return False
-        return abs(float(a_nums[-1].replace(",", "")) - float(b)) <= tol
-    
-    # Fall back to string comparison with cleaning
-    a_clean = re.sub(r'[\s,.;:!?\'"()$€£¥]', '', a_str.strip().lower())
-    b_clean = re.sub(r'[\s,.;:!?\'"()$€£¥]', '', b_str.strip().lower())
-    return a_clean == b_clean
+        return abs(float(nums[-1].replace(",", "")) - float(b)) <= tol
+    return str(a).strip().lower() == str(b).strip().lower()
 
 
 def run_math(
