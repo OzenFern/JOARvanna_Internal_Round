@@ -20,6 +20,7 @@ from blackbox.analysis.cloud import analyze_cloud
 from blackbox.debug.diagnose import create_diagnosis
 from blackbox.analysis.consensus import ConsensusResult
 from blackbox.explain.saliency import compute_step_saliency
+from app.paths import ARTIFACTS_DIR, TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(page_title="Diagnosis · Black Box", layout="wide")
@@ -27,7 +28,7 @@ st.title("Intelligent Fault Diagnosis & Attribution")
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 run_ids = store.list_runs()
 
 if not run_ids:
@@ -39,7 +40,7 @@ selected_run_id = st.selectbox("Select Agent Run to Diagnose:", run_ids, index=0
 trace = store.load(selected_run_id)
 
 model = LocalAttributionModel()
-model_path = Path("data/artifacts/model.pkl")
+model_path = ARTIFACTS_DIR / "model.pkl"
 if model_path.exists():
     model.load(model_path)
 

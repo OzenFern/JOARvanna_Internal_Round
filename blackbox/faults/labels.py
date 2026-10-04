@@ -17,7 +17,9 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-LABELS_PATH = Path("data/artifacts/labels.json")
+from blackbox.paths import ARTIFACTS_DIR
+
+LABELS_PATH = ARTIFACTS_DIR / "labels.json"
 
 
 @dataclass

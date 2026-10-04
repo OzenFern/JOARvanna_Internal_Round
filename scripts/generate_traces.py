@@ -11,6 +11,8 @@ import random
 import sys
 from pathlib import Path
 
+import yaml
+
 # Ensure package root is in path
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -19,20 +21,32 @@ if str(ROOT) not in sys.path:
 from blackbox.capture.store import TraceStore
 from blackbox.faults.injector import FaultInjector
 from blackbox.faults.labels import LabelStore
+from blackbox.paths import ARTIFACTS_DIR, TRACES_DIR
 from blackbox.agents.runner import run
 from blackbox.agents.tasks import math as math_tasks
 from blackbox.agents.tasks import qa as qa_tasks
 from blackbox.agents.tasks import text2sql as sql_tasks
 
 
-def generate(n: int = 50, fault_ratio: float = 0.6, output_dir: Path = Path("data/traces"), seed: int = 42):
+def generate(n: int = 50, fault_ratio: float = 0.6, output_dir: Path = TRACES_DIR, seed: int = 42, config_path: Path = ROOT / "configs" / "experiments" / "default.yaml"):
+    # Load experiment configuration from YAML
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+
     rng = random.Random(seed)
     store = TraceStore(output_dir)
-    labels = LabelStore(Path("data/artifacts/labels.json"))
+    labels = LabelStore(ARTIFACTS_DIR / "labels.json")
 
     print(f"Generating {n} agent execution traces into {output_dir}...")
+    print(f"Experiment: {config.get('name')}")
     task_types = ["math", "qa", "text2sql"]
     fault_types = ["bad_args", "fake_output", "poisoned_context", "truncation"]
+
+    # Use fault types from config if specified
+    held_out_faults = config.get("held_out_faults", [])
+    if held_out_faults:
+        fault_types = [ft for ft in fault_types if ft not in held_out_faults]
+        print(f"Held-out fault types: {held_out_faults}")
 
     success_count = 0
     fault_count = 0
@@ -78,7 +92,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate synthetic agent execution traces.")
     parser.add_argument("-n", "--num-traces", type=int, default=50, help="Number of traces to generate")
     parser.add_argument("-f", "--fault-ratio", type=float, default=0.6, help="Ratio of faulty traces")
-    parser.add_argument("-o", "--out", type=Path, default=Path("data/traces"), help="Output traces dir")
+    parser.add_argument("-o", "--out", type=Path, default=TRACES_DIR, help="Output traces dir")
     parser.add_argument("-s", "--seed", type=int, default=42, help="Random seed")
+    parser.add_argument("-c", "--config", type=Path, default=ROOT / "configs" / "experiments" / "default.yaml", help="Experiment config YAML")
     args = parser.parse_args()
-    generate(args.num_traces, args.fault_ratio, args.out, args.seed)
+    generate(args.num_traces, args.fault_ratio, args.out, args.seed, args.config)

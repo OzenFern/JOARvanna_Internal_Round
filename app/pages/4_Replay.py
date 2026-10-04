@@ -14,6 +14,7 @@ import json
 from blackbox.capture.store import TraceStore
 from blackbox.replay.resume import resume_from_step
 from blackbox.replay.checkpoint import CheckpointManager
+from app.paths import TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(page_title="Replay Studio · Black Box", layout="wide")
@@ -21,7 +22,7 @@ st.title("Checkpointed Time-Travel Replay Studio")
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 run_ids = store.list_runs()
 
 if not run_ids:

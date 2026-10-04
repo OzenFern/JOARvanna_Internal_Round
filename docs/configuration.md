@@ -526,31 +526,6 @@ export BLACKBOX_MODEL_PATH="/custom/path/to/model.pkl"
 
 ---
 
-## Configuration Validation
-
-Basic validation can be added to ensure configuration correctness:
-
-```python
-from pydantic import BaseModel, Field
-from typing import List
-
-class ExperimentConfig(BaseModel):
-    name: str
-    train_n: int = Field(gt=0)
-    eval_n: int = Field(gt=0)
-    held_out_faults: List[str]
-
-def validate_config(config_dict: dict, schema: BaseModel) -> BaseModel:
-    """Validate configuration against schema."""
-    return schema(**config_dict)
-
-# Usage
-config = load_config(Path("configs/experiments/default.yaml"))
-validated = validate_config(config, ExperimentConfig)
-```
-
----
-
 ## Summary
 
 Configuration files provide a flexible way to customize the Black Box system:

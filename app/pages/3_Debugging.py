@@ -18,6 +18,7 @@ from blackbox.debug.exceptions import analyze_exceptions
 from blackbox.debug.suggestions import generate_suggestions
 from blackbox.intervene.patch import StepPatch
 from blackbox.intervene.branch import create_branch
+from app.paths import ARTIFACTS_DIR, TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(page_title="Debugging · Black Box", layout="wide")
@@ -25,7 +26,7 @@ st.title("Interactive Debugging & Remediation Studio")
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 run_ids = store.list_runs()
 
 if not run_ids:
@@ -36,7 +37,7 @@ selected_run_id = st.selectbox("Select Failed Run to Debug:", run_ids, index=0)
 trace = store.load(selected_run_id)
 
 model = LocalAttributionModel()
-model_path = Path("data/artifacts/model.pkl")
+model_path = ARTIFACTS_DIR / "model.pkl"
 if model_path.exists():
     model.load(model_path)
 

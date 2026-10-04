@@ -26,10 +26,7 @@ from blackbox.capture.schema import (
     AgentError, AgentStep, AgentTrace, ModelCall,
     StepType, TaskType, ToolCall, TokenUsage, Checkpoint,
 )
-
-TRACES_DIR    = Path("data/traces")
-ARTIFACTS_DIR = Path("data/artifacts")
-
+from blackbox.paths import ARTIFACTS_DIR, TRACES_DIR
 
 # ── Serialisation helpers ──────────────────────────────────────────────────────
 
