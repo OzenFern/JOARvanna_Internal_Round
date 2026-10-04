@@ -12,6 +12,7 @@ intentional for training data generation (we need exact ground truth).
 from __future__ import annotations
 
 import random
+import re
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -26,12 +27,15 @@ from blackbox.agents.tasks import qa as qa_tasks
 from blackbox.agents.tasks import text2sql as sql_tasks
 from blackbox.faults.injector import FaultInjector
 
-
 def _close_enough(a: Any, b: Any, tol: float = 0.02) -> bool:
-    try:
-        return abs(float(a) - float(b)) <= tol
-    except (TypeError, ValueError):
-        return str(a).strip().lower() == str(b).strip().lower()
+    # Numeric expected answers (math): pull the last number out of the text,
+    # so "$439.40" or "The final answer is $439.40." matches 439.4.
+    if isinstance(b, (int, float)):
+        nums = re.findall(r"-?\d[\d,]*\.?\d*", str(a))
+        if not nums:
+            return False
+        return abs(float(nums[-1].replace(",", "")) - float(b)) <= tol
+    return str(a).strip().lower() == str(b).strip().lower()
 
 
 def run_math(
