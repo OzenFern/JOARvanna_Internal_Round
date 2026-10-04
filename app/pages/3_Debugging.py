@@ -18,9 +18,12 @@ from blackbox.debug.exceptions import analyze_exceptions
 from blackbox.debug.suggestions import generate_suggestions
 from blackbox.intervene.patch import StepPatch
 from blackbox.intervene.branch import create_branch
+from app.styles import inject_styles
 
-st.set_page_config(page_title="Debugging · Black Box", page_icon="🛠️", layout="wide")
-st.title("🛠️ Interactive Debugging & Remediation Studio")
+st.set_page_config(page_title="Debugging · Black Box", layout="wide")
+st.title("Interactive Debugging & Remediation Studio")
+
+inject_styles()
 
 store = TraceStore(Path("data/traces"))
 run_ids = store.list_runs()
@@ -51,10 +54,10 @@ if exc_analysis.has_exception:
     st.write(f"**Error Message:** `{exc_analysis.exception_message}`")
     st.info(f"**Root Cause Diagnosis:** {exc_analysis.root_cause_summary}")
 else:
-    st.success("✅ **No Explicit Uncaught Exceptions**: Silent semantic or computational failure detected.")
+    st.success("No explicit uncaught exceptions: silent semantic or computational failure detected.")
     st.info(f"The failure was caused by an erroneous intermediate calculation or retrieved fact at Step {suspect_step_idx} ({suspect_step.name if suspect_step else ''}).")
 
-st.markdown("---")
+st.divider()
 
 # Section 2: Actionable Remediation Suggestions
 st.subheader(f"2. Actionable Fix Suggestions for Step {suspect_step_idx} (`{suspect_step.name if suspect_step else ''}`)")
@@ -66,18 +69,17 @@ if not suggestions:
 else:
     for i, sug in enumerate(suggestions):
         with st.container():
-            st.markdown(f"### 💡 Suggestion #{i+1}: {sug.title}")
+            st.markdown(f"### Suggestion #{i+1}: {sug.title}")
             st.write(sug.description)
-            
+
             sc1, sc2 = st.columns([3, 1])
             with sc1:
                 st.markdown("**Proposed Patch Payload:**")
                 st.json(sug.patch_payload)
             with sc2:
                 st.metric("Patch Confidence", f"{sug.confidence:.0%}")
-                
-                # 1-Click Interactive Replay & Patch Button
-                if st.button(f"⚡ Apply Patch & Replay Branch", key=f"btn_patch_{i}", type="primary"):
+
+                if st.button(f"Apply Patch & Replay Branch", key=f"btn_patch_{i}", type="primary"):
                     with st.spinner("Forking state from checkpoint, applying patch, and resuming downstream steps..."):
                         patch_val = sug.patch_payload.get("output")
                         patch = StepPatch(
@@ -89,23 +91,23 @@ else:
                         )
                         repaired_trace = create_branch(trace, patch)
                         store.save(repaired_trace)
-                        
-                        st.session_state["last_repaired_run"] = repaired_trace
-                        st.success(f"🎉 Branch `{repaired_trace.run_id}` created and executed!")
 
-        st.markdown("---")
+                        st.session_state["last_repaired_run"] = repaired_trace
+                        st.success(f"Branch `{repaired_trace.run_id}` created and executed.")
+
+        st.divider()
 
 # Display Result of Repaired Run if available
 if "last_repaired_run" in st.session_state:
     rep = st.session_state["last_repaired_run"]
-    st.subheader(f"✨ Repaired Execution Result: `{rep.run_id}`")
-    
+    st.subheader(f"Repaired Execution Result: `{rep.run_id}`")
+
     r_res_col1, r_res_col2, r_res_col3 = st.columns(3)
     with r_res_col1:
-        st.metric("Repaired Outcome", "✅ SUCCESS" if rep.success else "❌ FAILED")
+        st.metric("Repaired Outcome", "SUCCESS" if rep.success else "FAILED")
     with r_res_col2:
         st.metric("Target Output", str(rep.expected_output))
     with r_res_col3:
         st.metric("Recomputed Final Output", str(rep.final_output))
-        
-    st.info(f"⚡ **Replay Savings:** Checkpoint resumption bypassed re-executing steps 0 to {suspect_step_idx-1}, saving **{rep.meta.get('replay_savings_pct', 0)}%** of runtime computation.")
+
+    st.info(f"**Replay Savings:** Checkpoint resumption bypassed re-executing steps 0 to {suspect_step_idx-1}, saving {rep.meta.get('replay_savings_pct', 0)}% of runtime computation.")

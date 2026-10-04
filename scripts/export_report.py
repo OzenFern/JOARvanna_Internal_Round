@@ -61,7 +61,7 @@ def export(run_id: str, traces_dir: Path = Path("data/traces"), output_file: Pat
 
     for i, s in enumerate(trace.steps):
         score = local_res.scores.get(i, 0.0)
-        marker = " ⚠️ **[CULPRIT]**" if i == diag.likely_source else ""
+        marker = " **[CULPRIT]**" if i == diag.likely_source else ""
         out_prev = str(s.output).replace("\n", " ")[:40]
         lines.append(f"| {i} | `{s.name}` | {s.step_type.value} | {s.latency_ms:.1f} | {score:.3f}{marker} | `{out_prev}` |")
 

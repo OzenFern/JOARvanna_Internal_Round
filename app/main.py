@@ -17,56 +17,25 @@ import streamlit as st
 import pandas as pd
 from blackbox.capture.store import TraceStore
 from blackbox.attribution.model import LocalAttributionModel
+from app.styles import inject_styles
 
 st.set_page_config(
     page_title="Black Box · Agent Debugger",
-    page_icon="⬛",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling
-st.markdown("""
-<style>
-    .metric-card {
-        background-color: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 10px;
-        padding: 16px;
-        color: white;
-    }
-    .badge-success {
-        background-color: #166534;
-        color: #86efac;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.8rem;
-    }
-    .badge-fail {
-        background-color: #991b1b;
-        color: #fca5a5;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.8rem;
-    }
-    .badge-high {
-        background-color: #1e3a8a;
-        color: #93c5fd;
-        padding: 3px 8px;
-        border-radius: 6px;
-        font-weight: 600;
-        font-size: 0.8rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+inject_styles()
 
 store = TraceStore(Path("data/traces"))
 traces = store.load_all()
 
-st.title("⬛ Black Box · AI Agent Debugging System")
-st.caption("Fault Localization · Checkpointed Replay · Counterfactual Branch Testing")
+st.title("Black Box")
+st.caption("AI agent debugging workspace  /  fault localization  /  checkpointed replay  /  branch testing")
+
+st.markdown(
+    "Inspect failures, verify likely causes, and replay corrected trajectories from one workspace."
+)
 
 # Top Metrics Row
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -87,14 +56,14 @@ with col4:
 with col5:
     st.metric("Local Diagnosis Target Latency", "< 50 ms")
 
-st.markdown("---")
+st.divider()
 
 # Quick Actions Bar
-st.subheader("⚡ Quick Control Actions")
+st.subheader("Quick Control Actions")
 qcol1, qcol2, qcol3 = st.columns(3)
 
 with qcol1:
-    if st.button("🎲 Generate Benchmark Traces (50 runs)", use_container_width=True):
+    if st.button("Generate Benchmark Traces (50 runs)", use_container_width=True):
         with st.spinner("Generating synthetic traces across Math, QA, Text2SQL..."):
             import random
             from blackbox.faults.injector import FaultInjector
@@ -124,7 +93,7 @@ with qcol1:
             st.rerun()
 
 with qcol2:
-    if st.button("🧠 Train Local ML Model (Gradient Boosting)", use_container_width=True):
+    if st.button("Train Local ML Model (Gradient Boosting)", use_container_width=True):
         if not traces:
             st.error("Generate traces first before training.")
         else:
@@ -138,7 +107,7 @@ with qcol2:
                 st.rerun()
 
 with qcol3:
-    if st.button("🗑️ Reset All Traces", use_container_width=True):
+    if st.button("Reset All Traces", use_container_width=True):
         import shutil
         if Path("data/traces").exists():
             shutil.rmtree("data/traces")
@@ -146,10 +115,10 @@ with qcol3:
         st.success("Cleared trace repository.")
         st.rerun()
 
-st.markdown("---")
+st.divider()
 
 # Recent Traces Table
-st.subheader("📋 Recent Agent Execution Traces")
+st.subheader("Recent Agent Execution Traces")
 
 if not traces:
     st.info("No traces currently loaded in `data/traces/`. Click 'Generate Benchmark Traces' above to create sample agent trajectories!")
@@ -161,16 +130,16 @@ else:
             "Domain": t.task_type.value.upper(),
             "Task Description": t.task_description[:60] + "..." if len(t.task_description) > 60 else t.task_description,
             "Steps": len(t.steps),
-            "Status": "✅ SUCCESS" if t.success else "❌ FAILED",
+            "Status": "SUCCESS" if t.success else "FAILED",
             "Injected Fault": t.fault_type.upper() if t.fault_type else "None",
             "Ground Truth Step": f"Step {t.fault_step}" if t.fault_step is not None else "N/A"
         })
-    
+
     df = pd.DataFrame(table_data)
     st.dataframe(df, use_container_width=True, hide_index=True)
 
-st.markdown("---")
-st.markdown("### 🧭 Workflow Navigation Guide")
+st.divider()
+st.markdown("### Workflow Navigation Guide")
 st.info("""
 - **1. Trace Viewer**: Inspect step-by-step agent trajectory, tool arguments, outputs, model reasoning, and latency.
 - **2. Diagnosis**: View ML-powered root cause step attribution, confidence ratings, and cloud LLM verification.

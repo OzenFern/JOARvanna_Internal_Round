@@ -531,7 +531,7 @@ def export(run_id: str, traces_dir: Path = Path("data/traces"),
 | Step | Name | Type | Latency (ms) | Suspicion | Output Summary |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 0 | `llm_call` | llm_call | 50.0 | 0.120 | `I need to calculate 2+2` |
-| 1 | `calculator()` | tool_call | 5.0 | 0.950 ⚠️ **[CULPRIT]** | `5` |
+| 1 | `calculator()` | tool_call | 5.0 | 0.950 **[CULPRIT]** | `5` |
 | 2 | `llm_call` | llm_call | 30.0 | 0.080 | `The answer is 5` |
 
 ## 3. Actionable Remediation Suggestions

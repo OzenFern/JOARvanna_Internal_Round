@@ -13,9 +13,12 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from blackbox.capture.store import TraceStore
+from app.styles import inject_styles
 
-st.set_page_config(page_title="Trace Viewer · Black Box", page_icon="🔍", layout="wide")
-st.title("🔍 Execution Trace Viewer")
+st.set_page_config(page_title="Trace Viewer · Black Box", layout="wide")
+st.title("Execution Trace Viewer")
+
+inject_styles()
 
 store = TraceStore(Path("data/traces"))
 run_ids = store.list_runs()
@@ -33,8 +36,7 @@ b_col1, b_col2, b_col3, b_col4, b_col5 = st.columns(5)
 with b_col1:
     st.markdown(f"**Task Domain:** `{trace.task_type.value.upper()}`")
 with b_col2:
-    status_color = "green" if trace.success else "red"
-    st.markdown(f"**Status:** :{status_color}[{'SUCCESS' if trace.success else 'FAILED'}]")
+    st.markdown(f"**Status:** {'SUCCESS' if trace.success else 'FAILED'}")
 with b_col3:
     st.markdown(f"**Total Steps:** `{len(trace.steps)}`")
 with b_col4:
@@ -47,16 +49,16 @@ st.info(f"**Task Goal:** {trace.task_description}")
 # Summary of Expected vs Actual Output
 out_col1, out_col2 = st.columns(2)
 with out_col1:
-    st.markdown("#### 🎯 Expected Output")
+    st.markdown("#### Expected Output")
     st.code(str(trace.expected_output), language="json")
 with out_col2:
-    st.markdown("#### 🏁 Final Agent Output")
+    st.markdown("#### Final Agent Output")
     st.code(str(trace.final_output), language="json")
 
-st.markdown("---")
+st.divider()
 
 # Execution Timeline & Charts
-st.subheader("📊 Step Latency & Token Breakdown")
+st.subheader("Step Latency & Token Breakdown")
 step_data = []
 for s in trace.steps:
     step_data.append({
@@ -76,17 +78,17 @@ with c_col2:
     fig_tok = px.bar(df_steps, x="Step", y="Tokens", color="Type", title="Tokens per Step")
     st.plotly_chart(fig_tok, use_container_width=True)
 
-st.markdown("---")
+st.divider()
 
 # Step Scrubber / Detail View
-st.subheader("📜 Step-by-Step Execution Sequence")
+st.subheader("Step-by-Step Execution Sequence")
 step_indices = [f"Step {s.step_index}: {s.name}" for s in trace.steps]
 selected_step_str = st.radio("Select Step to Inspect:", step_indices, horizontal=True)
 selected_idx = int(selected_step_str.split(":")[0].replace("Step", "").strip())
 step = trace.steps[selected_idx]
 
 # Step Card
-st.markdown(f"### 📍 Step {step.step_index}: `{step.name}` ({step.step_type.value})")
+st.markdown(f"### Step {step.step_index}: `{step.name}` ({step.step_type.value})")
 
 scol1, scol2, scol3 = st.columns(3)
 with scol1:
@@ -94,30 +96,30 @@ with scol1:
 with scol2:
     st.metric("Step Tokens", step.tokens.total_tokens if step.tokens else 0)
 with scol3:
-    st.metric("Error State", "⚠️ ERROR" if step.has_error else "NORMAL")
+    st.metric("Error State", "ERROR" if step.has_error else "NORMAL")
 
 if step.has_error and step.error:
     st.error(f"**Runtime Exception:** [{step.error.error_type}] {step.error.message}")
 
 d_col1, d_col2 = st.columns(2)
 with d_col1:
-    st.markdown("**📥 Inputs / Arguments:**")
+    st.markdown("**Inputs / Arguments:**")
     st.json(step.inputs)
 with d_col2:
-    st.markdown("**📤 Step Output / Observation:**")
+    st.markdown("**Step Output / Observation:**")
     if isinstance(step.output, (dict, list)):
         st.json(step.output)
     else:
         st.code(str(step.output))
 
 if step.tool_call:
-    with st.expander("🛠️ Tool Call Telemetry", expanded=False):
+    with st.expander("Tool Call Telemetry", expanded=False):
         st.write(f"**Tool:** `{step.tool_call.tool_name}`")
         st.write("**Arguments:**", step.tool_call.arguments)
         st.write(f"**Latency:** {step.tool_call.latency_ms:.1f} ms")
 
 if step.model_call:
-    with st.expander("🤖 Model Call Telemetry", expanded=False):
+    with st.expander("Model Call Telemetry", expanded=False):
         st.write(f"**Model:** `{step.model_call.model}`")
         st.write(f"**Prompt:** {step.model_call.prompt}")
         st.write(f"**Response:** {step.model_call.response}")
