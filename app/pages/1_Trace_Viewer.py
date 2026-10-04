@@ -13,6 +13,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from blackbox.capture.store import TraceStore
+from app.paths import TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(page_title="Trace Viewer · Black Box", layout="wide")
@@ -20,7 +21,7 @@ st.title("Execution Trace Viewer")
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 run_ids = store.list_runs()
 
 if not run_ids:

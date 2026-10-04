@@ -20,14 +20,15 @@ from blackbox.analysis.local import analyze_local
 from blackbox.debug.diagnose import create_diagnosis
 from blackbox.debug.suggestions import generate_suggestions
 from blackbox.analysis.consensus import ConsensusResult
+from blackbox.paths import ARTIFACTS_DIR, REPORTS_DIR, TRACES_DIR
 
 
-def export(run_id: str, traces_dir: Path = Path("data/traces"), output_file: Path = Path("data/reports/report.md")):
+def export(run_id: str, traces_dir: Path = TRACES_DIR, output_file: Path = REPORTS_DIR / "report.md"):
     store = TraceStore(traces_dir)
     trace = store.load(run_id)
 
     model = LocalAttributionModel()
-    model_p = Path("data/artifacts/model.pkl")
+    model_p = ARTIFACTS_DIR / "model.pkl"
     if model_p.exists():
         model.load(model_p)
 
@@ -85,7 +86,7 @@ def export(run_id: str, traces_dir: Path = Path("data/traces"), output_file: Pat
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Export diagnostic report.")
     parser.add_argument("run_id", help="Trace run ID")
-    parser.add_argument("-t", "--traces", type=Path, default=Path("data/traces"), help="Traces dir")
-    parser.add_argument("-o", "--out", type=Path, default=Path("data/reports/report.md"), help="Report output file")
+    parser.add_argument("-t", "--traces", type=Path, default=TRACES_DIR, help="Traces dir")
+    parser.add_argument("-o", "--out", type=Path, default=REPORTS_DIR / "report.md", help="Report output file")
     args = parser.parse_args()
     export(args.run_id, args.traces, args.out)

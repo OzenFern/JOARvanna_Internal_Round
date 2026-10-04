@@ -20,6 +20,7 @@ from blackbox.evaluate.confidence import eval_confidence
 from blackbox.evaluate.latency import eval_latency
 from blackbox.evaluate.generalization import eval_generalization
 from blackbox.evaluate.counterfactual import eval_counterfactual_repairs
+from app.paths import ARTIFACTS_DIR, TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(page_title="Evaluation · Black Box", layout="wide")
@@ -27,7 +28,7 @@ st.title("Model Evaluation & Diagnostic Benchmark Suite")
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 traces = store.load_all()
 
 if not traces:
@@ -35,7 +36,7 @@ if not traces:
     st.stop()
 
 model = LocalAttributionModel()
-model_path = Path("data/artifacts/model.pkl")
+model_path = ARTIFACTS_DIR / "model.pkl"
 if model_path.exists():
     model.load(model_path)
 

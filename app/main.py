@@ -17,6 +17,7 @@ import streamlit as st
 import pandas as pd
 from blackbox.capture.store import TraceStore
 from blackbox.attribution.model import LocalAttributionModel
+from app.paths import ARTIFACTS_DIR, TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(
@@ -27,7 +28,7 @@ st.set_page_config(
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 traces = store.load_all()
 
 st.title("Black Box")
@@ -42,7 +43,7 @@ col1, col2, col3, col4, col5 = st.columns(5)
 total_traces = len(traces)
 failed_traces = sum(1 for t in traces if not t.success)
 success_traces = total_traces - failed_traces
-model_path = Path("data/artifacts/model.pkl")
+model_path = ARTIFACTS_DIR / "model.pkl"
 model_trained = model_path.exists()
 
 with col1:
@@ -74,7 +75,7 @@ with qcol1:
             from blackbox.agents.tasks import text2sql as sql_tasks
 
             rng = random.Random(42)
-            labels = LabelStore(Path("data/artifacts/labels.json"))
+            labels = LabelStore(ARTIFACTS_DIR / "labels.json")
             task_types = ["math", "qa", "text2sql"]
             fault_types = ["bad_args", "fake_output", "poisoned_context", "truncation"]
 
@@ -99,7 +100,7 @@ with qcol2:
         else:
             with st.spinner("Extracting step embeddings & fitting Gradient Boosting model..."):
                 from blackbox.faults.labels import LabelStore
-                labels = LabelStore(Path("data/artifacts/labels.json"))
+                labels = LabelStore(ARTIFACTS_DIR / "labels.json")
                 model = LocalAttributionModel()
                 model.fit(traces, labels)
                 model.save(model_path)
@@ -109,9 +110,9 @@ with qcol2:
 with qcol3:
     if st.button("Reset All Traces", use_container_width=True):
         import shutil
-        if Path("data/traces").exists():
-            shutil.rmtree("data/traces")
-        Path("data/traces").mkdir(parents=True, exist_ok=True)
+        if TRACES_DIR.exists():
+            shutil.rmtree(TRACES_DIR)
+        TRACES_DIR.mkdir(parents=True, exist_ok=True)
         st.success("Cleared trace repository.")
         st.rerun()
 
@@ -121,7 +122,7 @@ st.divider()
 st.subheader("Recent Agent Execution Traces")
 
 if not traces:
-    st.info("No traces currently loaded in `data/traces/`. Click 'Generate Benchmark Traces' above to create sample agent trajectories!")
+    st.info("No traces are loaded yet. Use Generate Benchmark Traces above to create sample agent trajectories.")
 else:
     table_data = []
     for t in traces[:30]:

@@ -19,16 +19,17 @@ if str(ROOT) not in sys.path:
 from blackbox.capture.store import TraceStore
 from blackbox.faults.injector import FaultInjector
 from blackbox.faults.labels import LabelStore
+from blackbox.paths import ARTIFACTS_DIR, TRACES_DIR
 from blackbox.agents.runner import run
 from blackbox.agents.tasks import math as math_tasks
 from blackbox.agents.tasks import qa as qa_tasks
 from blackbox.agents.tasks import text2sql as sql_tasks
 
 
-def generate(n: int = 50, fault_ratio: float = 0.6, output_dir: Path = Path("data/traces"), seed: int = 42):
+def generate(n: int = 50, fault_ratio: float = 0.6, output_dir: Path = TRACES_DIR, seed: int = 42):
     rng = random.Random(seed)
     store = TraceStore(output_dir)
-    labels = LabelStore(Path("data/artifacts/labels.json"))
+    labels = LabelStore(ARTIFACTS_DIR / "labels.json")
 
     print(f"Generating {n} agent execution traces into {output_dir}...")
     task_types = ["math", "qa", "text2sql"]
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate synthetic agent execution traces.")
     parser.add_argument("-n", "--num-traces", type=int, default=50, help="Number of traces to generate")
     parser.add_argument("-f", "--fault-ratio", type=float, default=0.6, help="Ratio of faulty traces")
-    parser.add_argument("-o", "--out", type=Path, default=Path("data/traces"), help="Output traces dir")
+    parser.add_argument("-o", "--out", type=Path, default=TRACES_DIR, help="Output traces dir")
     parser.add_argument("-s", "--seed", type=int, default=42, help="Random seed")
     args = parser.parse_args()
     generate(args.num_traces, args.fault_ratio, args.out, args.seed)

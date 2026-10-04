@@ -15,12 +15,13 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from blackbox.capture.store import TraceStore
+from blackbox.paths import ARTIFACTS_DIR, TRACES_DIR
 from blackbox.faults.labels import LabelStore
 from blackbox.attribution.model import LocalAttributionModel
 from blackbox.evaluate.localization import eval_localization
 
 
-def train(traces_dir: Path = Path("data/traces"), labels_file: Path = Path("data/artifacts/labels.json"), output_model: Path = Path("data/artifacts/model.pkl")):
+def train(traces_dir: Path = TRACES_DIR, labels_file: Path = ARTIFACTS_DIR / "labels.json", output_model: Path = ARTIFACTS_DIR / "model.pkl"):
     store = TraceStore(traces_dir)
     traces = store.load_all()
     if not traces:
@@ -56,8 +57,8 @@ def train(traces_dir: Path = Path("data/traces"), labels_file: Path = Path("data
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train local attribution ML model.")
-    parser.add_argument("-t", "--traces", type=Path, default=Path("data/traces"), help="Traces dir")
-    parser.add_argument("-l", "--labels", type=Path, default=Path("data/artifacts/labels.json"), help="Labels JSON")
-    parser.add_argument("-o", "--out", type=Path, default=Path("data/artifacts/model.pkl"), help="Model output")
+    parser.add_argument("-t", "--traces", type=Path, default=TRACES_DIR, help="Traces dir")
+    parser.add_argument("-l", "--labels", type=Path, default=ARTIFACTS_DIR / "labels.json", help="Labels JSON")
+    parser.add_argument("-o", "--out", type=Path, default=ARTIFACTS_DIR / "model.pkl", help="Model output")
     args = parser.parse_args()
     train(args.traces, args.labels, args.out)

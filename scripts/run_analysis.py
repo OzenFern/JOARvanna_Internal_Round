@@ -17,12 +17,13 @@ from blackbox.capture.store import TraceStore
 from blackbox.attribution.model import LocalAttributionModel
 from blackbox.analysis.local import analyze_local
 from blackbox.analysis.cloud import analyze_cloud
+from blackbox.paths import ARTIFACTS_DIR, TRACES_DIR
 from blackbox.debug.diagnose import create_diagnosis
 from blackbox.debug.suggestions import generate_suggestions
 from blackbox.analysis.consensus import ConsensusResult
 
 
-def analyze(run_id: str, traces_dir: Path = Path("data/traces"), model_path: Path = Path("data/artifacts/model.pkl"), with_cloud: bool = False):
+def analyze(run_id: str, traces_dir: Path = TRACES_DIR, model_path: Path = ARTIFACTS_DIR / "model.pkl", with_cloud: bool = False):
     store = TraceStore(traces_dir)
     try:
         trace = store.load(run_id)
@@ -80,8 +81,8 @@ def analyze(run_id: str, traces_dir: Path = Path("data/traces"), model_path: Pat
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Analyze an agent trace.")
     parser.add_argument("run_id", help="Trace run ID to analyze")
-    parser.add_argument("-t", "--traces", type=Path, default=Path("data/traces"), help="Traces dir")
-    parser.add_argument("-m", "--model", type=Path, default=Path("data/artifacts/model.pkl"), help="Model path")
+    parser.add_argument("-t", "--traces", type=Path, default=TRACES_DIR, help="Traces dir")
+    parser.add_argument("-m", "--model", type=Path, default=ARTIFACTS_DIR / "model.pkl", help="Model path")
     parser.add_argument("-c", "--cloud", action="store_true", help="Run cloud LLM verification")
     args = parser.parse_args()
     analyze(args.run_id, args.traces, args.model, args.cloud)

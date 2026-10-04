@@ -14,6 +14,7 @@ import pandas as pd
 from blackbox.capture.store import TraceStore
 from blackbox.compare.divergence import find_divergence
 from blackbox.explain.contrast import generate_contrastive_explanation
+from app.paths import TRACES_DIR
 from app.styles import inject_styles
 
 st.set_page_config(page_title="Trace Diff · Black Box", layout="wide")
@@ -21,7 +22,7 @@ st.title("Side-by-Side Execution Trace Diff & Divergence")
 
 inject_styles()
 
-store = TraceStore(Path("data/traces"))
+store = TraceStore(TRACES_DIR)
 run_ids = store.list_runs()
 
 if len(run_ids) < 2:

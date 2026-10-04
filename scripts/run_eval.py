@@ -20,9 +20,10 @@ from blackbox.evaluate.localization import eval_localization
 from blackbox.evaluate.confidence import eval_confidence
 from blackbox.evaluate.latency import eval_latency
 from blackbox.evaluate.counterfactual import eval_counterfactual_repairs
+from blackbox.paths import ARTIFACTS_DIR, TRACES_DIR
 
 
-def evaluate(traces_dir: Path = Path("data/traces"), model_path: Path = Path("data/artifacts/model.pkl")):
+def evaluate(traces_dir: Path = TRACES_DIR, model_path: Path = ARTIFACTS_DIR / "model.pkl"):
     store = TraceStore(traces_dir)
     traces = store.load_all()
     if not traces:
@@ -65,7 +66,7 @@ def evaluate(traces_dir: Path = Path("data/traces"), model_path: Path = Path("da
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run benchmark evaluation.")
-    parser.add_argument("-t", "--traces", type=Path, default=Path("data/traces"), help="Traces dir")
-    parser.add_argument("-m", "--model", type=Path, default=Path("data/artifacts/model.pkl"), help="Model path")
+    parser.add_argument("-t", "--traces", type=Path, default=TRACES_DIR, help="Traces dir")
+    parser.add_argument("-m", "--model", type=Path, default=ARTIFACTS_DIR / "model.pkl", help="Model path")
     args = parser.parse_args()
     evaluate(args.traces, args.model)
