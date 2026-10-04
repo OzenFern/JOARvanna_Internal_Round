@@ -44,7 +44,7 @@ def train(traces_dir: Path = TRACES_DIR, labels_file: Path = ARTIFACTS_DIR / "la
     print(f"Configuration: {config.get('architecture')} with {config.get('embeddings')} embeddings")
     t0 = time.perf_counter()
 
-    model = LocalAttributionModel(max_features=config.get("max_features", 128))
+    model = LocalAttributionModel()
     model.fit(traces, labels)
     model.save(output_model)
     elapsed = (time.perf_counter() - t0) * 1000
