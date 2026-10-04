@@ -20,9 +20,12 @@ from blackbox.evaluate.confidence import eval_confidence
 from blackbox.evaluate.latency import eval_latency
 from blackbox.evaluate.generalization import eval_generalization
 from blackbox.evaluate.counterfactual import eval_counterfactual_repairs
+from app.styles import inject_styles
 
-st.set_page_config(page_title="Evaluation · Black Box", page_icon="📈", layout="wide")
-st.title("📈 Model Evaluation & Diagnostic Benchmark Suite")
+st.set_page_config(page_title="Evaluation · Black Box", layout="wide")
+st.title("Model Evaluation & Diagnostic Benchmark Suite")
+
+inject_styles()
 
 store = TraceStore(Path("data/traces"))
 traces = store.load_all()
@@ -54,7 +57,7 @@ with m3:
 with m4:
     st.metric("Diagnosis Latency (Mean)", f"{lat_metrics.mean_local_latency_ms:.2f} ms")
 
-st.markdown("---")
+st.divider()
 
 # Chart 1: Per-Fault Type Accuracy Breakdown
 st.subheader("2. Fault Localization Accuracy by Injected Category")
@@ -79,7 +82,7 @@ with c_col1:
         st.info("No fault breakdowns recorded yet.")
 
 with c_col2:
-    st.markdown("#### 🎯 Confidence Calibration Tiers")
+    st.markdown("#### Confidence Calibration Tiers")
     conf_df = pd.DataFrame([
         {"Tier": "High Confidence", "Total Predictions": conf_metrics.high_tier.total_predictions, "Accuracy": f"{conf_metrics.high_tier.accuracy:.1%}"},
         {"Tier": "Medium Confidence", "Total Predictions": conf_metrics.medium_tier.total_predictions, "Accuracy": f"{conf_metrics.medium_tier.accuracy:.1%}"},
@@ -87,14 +90,14 @@ with c_col2:
     ])
     st.dataframe(conf_df, use_container_width=True, hide_index=True)
 
-st.markdown("---")
+st.divider()
 
 # Generalization & Replay Metrics
 st.subheader("3. Domain Generalization & Counterfactual Repair Efficacy")
 g1, g2 = st.columns(2)
 
 with g1:
-    st.markdown("#### 🌐 Cross-Domain Performance")
+    st.markdown("#### Cross-Domain Performance")
     task_df = pd.DataFrame([
         {"Task Domain": k.upper(), "Accuracy": v}
         for k, v in gen_report.cross_task_metrics.items()
@@ -105,8 +108,8 @@ with g1:
         st.plotly_chart(fig_task, use_container_width=True)
 
 with g2:
-    st.markdown("#### ⚡ Time-Travel Counterfactual Repair Efficacy")
+    st.markdown("#### Time-Travel Counterfactual Repair Efficacy")
     st.metric("1-Click Patch Success Rate", f"{cf_metrics.repair_success_rate:.1f}%")
     st.write(f"Tested on **{cf_metrics.total_tested}** faulty trajectories.")
     st.write(f"Successfully repaired **{cf_metrics.successful_repairs}** runs by patching suspected root-cause step.")
-    st.success("✅ Demonstrates that learned fault localizations are actionable and verifiable via replay.")
+    st.success("This demonstrates that learned fault localizations are actionable and verifiable via replay.")

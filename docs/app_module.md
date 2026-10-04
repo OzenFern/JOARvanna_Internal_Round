@@ -70,7 +70,6 @@ The main landing page provides a high-level overview of the system and quick con
 ```python
 st.set_page_config(
     page_title="Black Box · Agent Debugger",
-    page_icon="⬛",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -930,7 +929,7 @@ The app uses consistent styling across all pages:
 3. **Data Tables**: Use `st.dataframe()` with `use_container_width=True`
 4. **Code Display**: Use `st.code()` for JSON/code snippets
 5. **Expandable Sections**: Use `st.expander()` for detailed information
-6. **Status Indicators**: Use emojis (✅, ❌, ⚠️, 🔴, 🟢) for visual cues
+6. **Status Indicators**: Use clear text labels and Streamlit status components for visual cues
 
 ### Layout Patterns
 

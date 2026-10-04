@@ -14,9 +14,12 @@ import json
 from blackbox.capture.store import TraceStore
 from blackbox.replay.resume import resume_from_step
 from blackbox.replay.checkpoint import CheckpointManager
+from app.styles import inject_styles
 
-st.set_page_config(page_title="Replay Studio · Black Box", page_icon="⏪", layout="wide")
-st.title("⏪ Checkpointed Time-Travel Replay Studio")
+st.set_page_config(page_title="Replay Studio · Black Box", layout="wide")
+st.title("Checkpointed Time-Travel Replay Studio")
+
+inject_styles()
 
 store = TraceStore(Path("data/traces"))
 run_ids = store.list_runs()
@@ -29,9 +32,9 @@ selected_run_id = st.selectbox("Select Baseline Run to Replay / Fork:", run_ids,
 trace = store.load(selected_run_id)
 
 st.markdown(f"**Task:** {trace.task_description}")
-st.markdown(f"**Baseline Status:** {'✅ SUCCESS' if trace.success else '❌ FAILED'}")
+st.markdown(f"**Baseline Status:** {'SUCCESS' if trace.success else 'FAILED'}")
 
-st.markdown("---")
+st.divider()
 
 # Checkpoint Step Selector
 st.subheader("1. Select Checkpoint Step to Fork From")
@@ -41,20 +44,20 @@ fork_step_idx = int(selected_step_str.split(":")[0].replace("Step", "").strip())
 fork_step = trace.steps[fork_step_idx]
 
 # Checkpoint State Inspector
-with st.expander(f"📦 Inspect Checkpoint State at Step {fork_step_idx}", expanded=False):
+with st.expander(f"Inspect Checkpoint State at Step {fork_step_idx}", expanded=False):
     state_snap = CheckpointManager.extract_state_at_step(trace, fork_step_idx)
     st.json(state_snap)
 
-st.markdown("---")
+st.divider()
 
 # Intervention & Patch Editor
 st.subheader("2. Configure Step Intervention / Patch")
 p_col1, p_col2 = st.columns(2)
 
 with p_col1:
-    st.markdown("#### 📤 Current Step Output (Frozen in Checkpoint)")
+    st.markdown("#### Current Step Output (Frozen in Checkpoint)")
     st.code(str(fork_step.output))
-    
+
     patch_output_val = st.text_input(
         "Patched Output Value (Override):",
         value=str(fork_step.output),
@@ -62,7 +65,7 @@ with p_col1:
     )
 
 with p_col2:
-    st.markdown("#### 📥 Current Step Inputs")
+    st.markdown("#### Current Step Inputs")
     st.json(fork_step.inputs)
     patch_inputs_json = st.text_area(
         "Patched Inputs JSON (Optional):",
@@ -72,9 +75,8 @@ with p_col2:
 
 # Execution Button
 st.markdown("---")
-if st.button("🚀 Replay Forward from Checkpoint", type="primary", use_container_width=True):
+if st.button("Replay Forward from Checkpoint", type="primary", use_container_width=True):
     with st.spinner(f"Resuming execution from Step {fork_step_idx} with patched parameters..."):
-        # Convert numeric if possible
         try:
             if "." in patch_output_val:
                 val = float(patch_output_val)
@@ -96,25 +98,25 @@ if st.button("🚀 Replay Forward from Checkpoint", type="primary", use_containe
         )
         store.save(new_trace)
         st.session_state["replay_result"] = new_trace
-        st.success(f"Execution resumed! New Child Run ID: `{new_trace.run_id}`")
+        st.success(f"Execution resumed. New child run ID: `{new_trace.run_id}`")
 
 # Replay Result View
 if "replay_result" in st.session_state:
     res_trace = st.session_state["replay_result"]
-    st.markdown("### 📊 Replayed Trajectory Outcome")
-    
+    st.markdown("### Replayed Trajectory Outcome")
+
     r1, r2, r3, r4 = st.columns(4)
     with r1:
         st.metric("New Run ID", res_trace.run_id)
     with r2:
-        st.metric("Final Status", "✅ SUCCESS" if res_trace.success else "❌ FAILED")
+        st.metric("Final Status", "SUCCESS" if res_trace.success else "FAILED")
     with r3:
         st.metric("Expected Answer", str(res_trace.expected_output))
     with r4:
         st.metric("Replayed Final Output", str(res_trace.final_output))
 
     st.success(f"""
-    ⚡ **Resource & Latency Savings:**
+    **Resource & Latency Savings:**
     - **Steps Reused (No re-computation):** {fork_step_idx} / {len(res_trace.steps)} steps
     - **Computational Time Saved:** ~{res_trace.meta.get('replay_savings_pct', 0)}%
     """)
